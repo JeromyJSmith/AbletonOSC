@@ -45,15 +45,16 @@ class OscBundleBuilder(object):
         try:
             dgram += osc_types.write_date(self._timestamp)
             for content in self._contents:
-                if (type(content) == osc_message.OscMessage
-                        or type(content) == osc_bundle.OscBundle):
-                    size = content.size
-                    dgram += osc_types.write_int(size)
-                    dgram += content.dgram
-                else:
+                if type(content) not in [
+                    osc_message.OscMessage,
+                    osc_bundle.OscBundle,
+                ]:
                     raise BuildError(
-                        "Content must be either OscBundle or OscMessage"
-                        "found {}".format(type(content)))
+                        f"Content must be either OscBundle or OscMessagefound {type(content)}"
+                    )
+                size = content.size
+                dgram += osc_types.write_int(size)
+                dgram += content.dgram
             return osc_bundle.OscBundle(dgram)
         except osc_types.BuildError as be:
-            raise BuildError('Could not build the bundle {}'.format(be))
+            raise BuildError(f'Could not build the bundle {be}')

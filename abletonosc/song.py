@@ -36,7 +36,7 @@ class SongHandler(AbletonOSCHandler):
             "undo"
         ]:
             callback = partial(self._call_method, self.song, method)
-            self.osc_server.add_handler("/live/song/%s" % method, callback)
+            self.osc_server.add_handler(f"/live/song/{method}", callback)
 
         #--------------------------------------------------------------------------------
         # Callbacks for Song: properties (read/write)
@@ -71,11 +71,23 @@ class SongHandler(AbletonOSCHandler):
         ]
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/song/get/%s" % prop, partial(self._get_property, self.song, prop))
-            self.osc_server.add_handler("/live/song/start_listen/%s" % prop, partial(self._start_listen, self.song, prop))
-            self.osc_server.add_handler("/live/song/stop_listen/%s" % prop, partial(self._stop_listen, self.song, prop))
+            self.osc_server.add_handler(
+                f"/live/song/get/{prop}",
+                partial(self._get_property, self.song, prop),
+            )
+            self.osc_server.add_handler(
+                f"/live/song/start_listen/{prop}",
+                partial(self._start_listen, self.song, prop),
+            )
+            self.osc_server.add_handler(
+                f"/live/song/stop_listen/{prop}",
+                partial(self._stop_listen, self.song, prop),
+            )
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set_property, self.song, prop))
+            self.osc_server.add_handler(
+                f"/live/song/set/{prop}",
+                partial(self._set_property, self.song, prop),
+            )
 
         #--------------------------------------------------------------------------------
         # Callbacks for Song: Track properties
@@ -88,6 +100,7 @@ class SongHandler(AbletonOSCHandler):
             else:
                 track_index_min, track_index_max = params
             return tuple(self.song.tracks[index].name for index in range(track_index_min, track_index_max))
+
         self.osc_server.add_handler("/live/song/get/track_names", song_get_track_names)
 
         def song_get_track_data(params):
@@ -125,6 +138,7 @@ class SongHandler(AbletonOSCHandler):
                             else:
                                 rv.append(None)
             return tuple(rv)
+
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
 
         #--------------------------------------------------------------------------------
@@ -138,6 +152,7 @@ class SongHandler(AbletonOSCHandler):
             else:
                 scene_index_min, scene_index_max = params
             return tuple(self.song.scenes[index].name for index in range(scene_index_min, scene_index_max))
+
         self.osc_server.add_handler("/live/song/get/scene_names", song_get_scene_names)
 
         #--------------------------------------------------------------------------------
@@ -147,6 +162,7 @@ class SongHandler(AbletonOSCHandler):
             cue_points = song.cue_points
             cue_point_pairs = [(cue_point.name, cue_point.time) for cue_point in cue_points]
             return (element for pair in cue_point_pairs for element in pair)
+
         self.osc_server.add_handler("/live/song/get/cue_points", partial(song_get_cue_points, self.song))
 
         def song_jump_to_cue_point(song, params: Tuple[Any] = ()):
@@ -158,6 +174,7 @@ class SongHandler(AbletonOSCHandler):
             elif isinstance(cue_point_index, int):
                 cue_point = song.cue_points[cue_point_index]
                 cue_point.jump()
+
         self.osc_server.add_handler("/live/song/cue_point/jump", partial(song_jump_to_cue_point, self.song))
 
         #--------------------------------------------------------------------------------

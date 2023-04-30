@@ -43,7 +43,7 @@ def write_string(val: str) -> bytes:
     try:
         dgram = val.encode('utf-8')  # Default, but better be explicit.
     except (UnicodeEncodeError, AttributeError) as e:
-        raise BuildError('Incorrect string, could not encode {}'.format(e))
+        raise BuildError(f'Incorrect string, could not encode {e}')
     diff = _STRING_DGRAM_PAD - (len(dgram) % _STRING_DGRAM_PAD)
     dgram += (b'\x00' * diff)
     return dgram
@@ -88,9 +88,9 @@ def get_string(dgram: bytes, start_index: int) -> Tuple[str, int]:
         data_str = dgram[start_index:start_index + offset]
         return data_str.replace(b'\x00', b'').decode('utf-8'), start_index + offset
     except IndexError as ie:
-        raise ParseError('Could not parse datagram %s' % ie)
+        raise ParseError(f'Could not parse datagram {ie}')
     except TypeError as te:
-        raise ParseError('Could not parse datagram %s' % te)
+        raise ParseError(f'Could not parse datagram {te}')
 
 
 def write_int(val: int) -> bytes:
@@ -102,7 +102,7 @@ def write_int(val: int) -> bytes:
     try:
         return struct.pack('>i', val)
     except struct.error as e:
-        raise BuildError('Wrong argument value passed: {}'.format(e))
+        raise BuildError(f'Wrong argument value passed: {e}')
 
 
 def get_int(dgram: bytes, start_index: int) -> Tuple[int, int]:
@@ -126,7 +126,7 @@ def get_int(dgram: bytes, start_index: int) -> Tuple[int, int]:
                           dgram[start_index:start_index + _INT_DGRAM_LEN])[0],
             start_index + _INT_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def write_int64(val: int) -> bytes:
@@ -138,7 +138,7 @@ def write_int64(val: int) -> bytes:
     try:
         return struct.pack('>q', val)
     except struct.error as e:
-        raise BuildError('Wrong argument value passed: {}'.format(e))
+        raise BuildError(f'Wrong argument value passed: {e}')
 
 
 def get_int64(dgram: bytes, start_index: int) -> Tuple[int, int]:
@@ -162,7 +162,7 @@ def get_int64(dgram: bytes, start_index: int) -> Tuple[int, int]:
                           dgram[start_index:start_index + _INT64_DGRAM_LEN])[0],
             start_index + _INT64_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def get_uint64(dgram: bytes, start_index: int) -> Tuple[int, int]:
@@ -186,7 +186,7 @@ def get_uint64(dgram: bytes, start_index: int) -> Tuple[int, int]:
                           dgram[start_index:start_index + _UINT64_DGRAM_LEN])[0],
             start_index + _UINT64_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def get_timetag(dgram: bytes, start_index: int) -> Tuple[Tuple[datetime, int], int]:
@@ -218,7 +218,7 @@ def get_timetag(dgram: bytes, start_index: int) -> Tuple[Tuple[datetime, int], i
 
         return (utc, fraction), start_index + _TIMETAG_DGRAM_LEN
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def write_float(val: float) -> bytes:
@@ -230,7 +230,7 @@ def write_float(val: float) -> bytes:
     try:
         return struct.pack('>f', val)
     except struct.error as e:
-        raise BuildError('Wrong argument value passed: {}'.format(e))
+        raise BuildError(f'Wrong argument value passed: {e}')
 
 
 def get_float(dgram: bytes, start_index: int) -> Tuple[float, int]:
@@ -251,13 +251,13 @@ def get_float(dgram: bytes, start_index: int) -> Tuple[float, int]:
             # Noticed that Reaktor doesn't send the last bunch of \x00 needed to make
             # the float representation complete in some cases, thus we pad here to
             # account for that.
-            dgram = dgram + b'\x00' * (_FLOAT_DGRAM_LEN - len(dgram[start_index:]))
+            dgram += b'\x00' * (_FLOAT_DGRAM_LEN - len(dgram[start_index:]))
         return (
             struct.unpack('>f',
                           dgram[start_index:start_index + _FLOAT_DGRAM_LEN])[0],
             start_index + _FLOAT_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def write_double(val: float) -> bytes:
@@ -269,7 +269,7 @@ def write_double(val: float) -> bytes:
     try:
         return struct.pack('>d', val)
     except struct.error as e:
-        raise BuildError('Wrong argument value passed: {}'.format(e))
+        raise BuildError(f'Wrong argument value passed: {e}')
 
 
 def get_double(dgram: bytes, start_index: int) -> Tuple[float, int]:
@@ -293,7 +293,7 @@ def get_double(dgram: bytes, start_index: int) -> Tuple[float, int]:
                           dgram[start_index:start_index + _DOUBLE_DGRAM_LEN])[0],
             start_index + _DOUBLE_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram {}'.format(e))
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def get_blob(dgram: bytes, start_index: int) -> Tuple[bytes, int]:
@@ -386,7 +386,7 @@ def write_rgba(val: bytes) -> bytes:
     try:
         return struct.pack('>I', val)
     except struct.error as e:
-        raise BuildError('Wrong argument value passed: {}'.format(e))
+        raise BuildError(f'Wrong argument value passed: {e}')
 
 
 def get_rgba(dgram: bytes, start_index: int) -> Tuple[bytes, int]:
@@ -410,7 +410,7 @@ def get_rgba(dgram: bytes, start_index: int) -> Tuple[bytes, int]:
                           dgram[start_index:start_index + _INT_DGRAM_LEN])[0],
             start_index + _INT_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')
 
 
 def write_midi(val: MidiPacket) -> bytes:
@@ -428,7 +428,7 @@ def write_midi(val: MidiPacket) -> bytes:
         value = sum((value & 0xFF) << 8 * (3 - pos) for pos, value in enumerate(val))
         return struct.pack('>I', value)
     except struct.error as e:
-        raise BuildError('Wrong argument value passed: {}'.format(e))
+        raise BuildError(f'Wrong argument value passed: {e}')
 
 
 def get_midi(dgram: bytes, start_index: int) -> Tuple[MidiPacket, int]:
@@ -454,4 +454,4 @@ def get_midi(dgram: bytes, start_index: int) -> Tuple[MidiPacket, int]:
             tuple((val & 0xFF << 8 * i) >> 8 * i for i in range(3, -1, -1)))
         return (midi_msg, start_index + _INT_DGRAM_LEN)
     except (struct.error, TypeError) as e:
-        raise ParseError('Could not parse datagram %s' % e)
+        raise ParseError(f'Could not parse datagram {e}')

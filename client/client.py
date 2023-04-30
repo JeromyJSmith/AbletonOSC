@@ -76,7 +76,7 @@ class AbletonOSCClient:
         _event = threading.Event()
 
         def received_response(params):
-            print("Received response: %s %s" % (address, str(params)))
+            print(f"Received response: {address} {str(params)}")
             nonlocal rv
             nonlocal _event
             rv = params
@@ -86,7 +86,7 @@ class AbletonOSCClient:
         _event.wait(timeout)
         self.remove_handler(address)
         if not _event.is_set():
-            raise RuntimeError("No response received to query: %s" % address)
+            raise RuntimeError(f"No response received to query: {address}")
         return rv
 
     def query(self,
@@ -107,7 +107,7 @@ class AbletonOSCClient:
         _event.wait(timeout)
         self.remove_handler(address)
         if not _event.is_set():
-            raise RuntimeError("No response received to query: %s" % address)
+            raise RuntimeError(f"No response received to query: {address}")
         return rv
 
 def main(args):

@@ -31,10 +31,12 @@ def _create_test_clips(client):
 
 def _test_clip_property(client, track_id, clip_id, property, values):
     for value in values:
-        print("Testing clip property %s, value: %s" % (property, value))
-        client.send_message("/live/clip/set/%s" % property, (track_id, clip_id, value))
+        print(f"Testing clip property {property}, value: {value}")
+        client.send_message(f"/live/clip/set/{property}", (track_id, clip_id, value))
         wait_one_tick()
-        assert client.query("/live/clip/get/%s" % property, (track_id, clip_id)) == (value,)
+        assert client.query(
+            f"/live/clip/get/{property}", (track_id, clip_id)
+        ) == (value,)
 
 def test_clip_property_name(client):
     _test_clip_property(client, 0, 0, "name", ("Alpha", "Beta"))

@@ -58,19 +58,29 @@ class ClipHandler(AbletonOSCHandler):
         ]
 
         for method in methods:
-            self.osc_server.add_handler("/live/clip/%s" % method,
-                                        create_clip_callback(self._call_method, method))
+            self.osc_server.add_handler(
+                f"/live/clip/{method}",
+                create_clip_callback(self._call_method, method),
+            )
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/clip/get/%s" % prop,
-                                        create_clip_callback(self._get_property, prop))
-            self.osc_server.add_handler("/live/clip/start_listen/%s" % prop,
-                                        create_clip_callback(self._start_listen, prop))
-            self.osc_server.add_handler("/live/clip/stop_listen/%s" % prop,
-                                        create_clip_callback(self._stop_listen, prop))
+            self.osc_server.add_handler(
+                f"/live/clip/get/{prop}",
+                create_clip_callback(self._get_property, prop),
+            )
+            self.osc_server.add_handler(
+                f"/live/clip/start_listen/{prop}",
+                create_clip_callback(self._start_listen, prop),
+            )
+            self.osc_server.add_handler(
+                f"/live/clip/stop_listen/{prop}",
+                create_clip_callback(self._stop_listen, prop),
+            )
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/clip/set/%s" % prop,
-                                        create_clip_callback(self._set_property, prop))
+            self.osc_server.add_handler(
+                f"/live/clip/set/{prop}",
+                create_clip_callback(self._set_property, prop),
+            )
 
         def clip_get_notes(clip, params: Tuple[Any] = ()):
             notes = clip.get_notes(0, 0, clip.length, 127)
@@ -114,7 +124,7 @@ class ClipHandler(AbletonOSCHandler):
             track_index, clip_index = track_clip_index
             clip = self.song.tracks[track_index].clip_slots[clip_index].clip
 
-            if track_clip_index in self.clip_listeners.keys():
+            if track_clip_index in self.clip_listeners:
                 clip.remove_playing_position_listener(self.clip_listeners[track_clip_index])
                 del self.clip_listeners[track_clip_index]
 
