@@ -80,7 +80,7 @@ class OSCServer:
                 remote_addr = self._remote_addr
             self._socket.sendto(msg.dgram, remote_addr)
         except BuildError:
-            self.logger.info("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
+            self.logger.info(f"AbletonOSC: OSC build error: {traceback.format_exc()}")
 
     def process(self) -> None:
         """
@@ -114,30 +114,28 @@ class OSCServer:
                                       params=rv,
                                       remote_addr=response_addr)
                     else:
-                        self.logger.info("AbletonOSC: Unknown OSC address: %s" % message.address)
+                        self.logger.info(f"AbletonOSC: Unknown OSC address: {message.address}")
                 except ParseError:
-                    self.logger.info("AbletonOSC: OSC parse error: %s" % (traceback.format_exc()))
+                    self.logger.info(f"AbletonOSC: OSC parse error: {traceback.format_exc()}")
 
         except socket.error as e:
             if e.errno == errno.ECONNRESET:
                 #--------------------------------------------------------------------------------
                 # This benign error seems to occur on startup on Windows
                 #--------------------------------------------------------------------------------
-                self.logger.warning("AbletonOSC: Non-fatal socket error: %s" % (traceback.format_exc()))
-            elif e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
-                #--------------------------------------------------------------------------------
-                # Another benign networking error, throw when no data is received
-                # on a call to recvfrom() on a non-blocking socket
-                #--------------------------------------------------------------------------------
-                pass
-            else:
+                self.logger.warning(
+                    f"AbletonOSC: Non-fatal socket error: {traceback.format_exc()}"
+                )
+            elif e.errno not in [errno.EAGAIN, errno.EWOULDBLOCK]:
                 #--------------------------------------------------------------------------------
                 # Something more serious has happened
                 #--------------------------------------------------------------------------------
-                self.logger.info("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
+                self.logger.info(f"AbletonOSC: Socket error: {traceback.format_exc()}")
 
         except Exception as e:
-            self.logger.info("AbletonOSC: Error handling message: %s" % (traceback.format_exc()))
+            self.logger.info(
+                f"AbletonOSC: Error handling message: {traceback.format_exc()}"
+            )
 
     def shutdown(self) -> None:
         """

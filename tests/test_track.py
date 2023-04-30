@@ -17,10 +17,10 @@ def test_track_get_send(client):
 
 def _test_track_property(client, track_id, property, values):
     for value in values:
-        print("Testing property %s, value: %s" % (property, value))
-        client.send_message("/live/track/set/%s" % property, [track_id, value])
+        print(f"Testing property {property}, value: {value}")
+        client.send_message(f"/live/track/set/{property}", [track_id, value])
         wait_one_tick()
-        assert client.query("/live/track/get/%s" % property, [track_id]) == (value,)
+        assert client.query(f"/live/track/get/{property}", [track_id]) == (value,)
 
 def test_track_property_panning(client):
     _test_track_property(client, 2, "panning", [0.5, 0.0])
