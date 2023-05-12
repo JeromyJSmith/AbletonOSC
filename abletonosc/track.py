@@ -8,13 +8,13 @@ class TrackHandler(AbletonOSCHandler):
 
     def init_api(self):
         def create_track_callback(func: Callable,
-                                  *args,
-                                  include_track_id: bool = False):
+                                      *args,
+                                      include_track_id: bool = False):
             def track_callback(params: Tuple[Any]):
                 track_index = params[0]
                 track = self.song.tracks[track_index]
                 if include_track_id:
-                    return func(track, *args, tuple(params[0:]))
+                    return func(track, *args, tuple(params[:]))
                 else:
                     return func(track, *args, tuple(params[1:]))
 
@@ -48,19 +48,33 @@ class TrackHandler(AbletonOSCHandler):
         ]
 
         for method in methods:
-            self.osc_server.add_handler("/live/track/%s" % method,
-                                        create_track_callback(self._call_method, method))
+            self.osc_server.add_handler(
+                f"/live/track/{method}",
+                create_track_callback(self._call_method, method),
+            )
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/track/get/%s" % prop,
-                                        create_track_callback(self._get_property, prop))
-            self.osc_server.add_handler("/live/track/start_listen/%s" % prop,
-                                        create_track_callback(self._start_listen, prop, include_track_id=True))
-            self.osc_server.add_handler("/live/track/stop_listen/%s" % prop,
-                                        create_track_callback(self._stop_listen, prop, include_track_id=True))
+            self.osc_server.add_handler(
+                f"/live/track/get/{prop}",
+                create_track_callback(self._get_property, prop),
+            )
+            self.osc_server.add_handler(
+                f"/live/track/start_listen/{prop}",
+                create_track_callback(
+                    self._start_listen, prop, include_track_id=True
+                ),
+            )
+            self.osc_server.add_handler(
+                f"/live/track/stop_listen/{prop}",
+                create_track_callback(
+                    self._stop_listen, prop, include_track_id=True
+                ),
+            )
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/track/set/%s" % prop,
-                                        create_track_callback(self._set_property, prop))
+            self.osc_server.add_handler(
+                f"/live/track/set/{prop}",
+                create_track_callback(self._set_property, prop),
+            )
 
         #--------------------------------------------------------------------------------
         # Volume, panning and send are properties of the track's mixer_device so

@@ -49,11 +49,10 @@ class Handler(object):
                 self.callback(client_address, message.address, self.args, *message)
             else:
                 self.callback(client_address, message.address, *message)
+        elif self.args:
+            self.callback(message.address, self.args, *message)
         else:
-            if self.args:
-                self.callback(message.address, self.args, *message)
-            else:
-                self.callback(message.address, *message)
+            self.callback(message.address, *message)
 
 
 class Dispatcher(object):
@@ -130,7 +129,9 @@ class Dispatcher(object):
                 self._map[address].remove(Handler(handler, list(args), needs_reply_address))
         except ValueError as e:
             if str(e) == "list.remove(x): x not in list":
-                raise ValueError("Address '%s' doesn't have handler '%s' mapped to it" % (address, handler)) from e
+                raise ValueError(
+                    f"Address '{address}' doesn't have handler '{handler}' mapped to it"
+                ) from e
 
     def handlers_for_address(self, address_pattern: str) -> Generator[Handler, None, None]:
         """Yields handlers matching an address
@@ -153,7 +154,7 @@ class Dispatcher(object):
         pattern = pattern.replace('\\*', '[\w|\+]*')
         # The rest of the syntax in the specification is like the re module so
         # we're fine.
-        pattern = pattern + '$'
+        pattern = f'{pattern}$'
         patterncompiled = re.compile(pattern)
         matched = False
 

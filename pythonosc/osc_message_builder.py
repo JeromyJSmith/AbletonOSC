@@ -63,10 +63,7 @@ class OscMessageBuilder(object):
         if arg_type in self._SUPPORTED_ARG_TYPES:
             return True
         elif isinstance(arg_type, list):
-            for sub_type in arg_type:
-                if not self._valid_type(sub_type):
-                    return False
-            return True
+            return all(self._valid_type(sub_type) for sub_type in arg_type)
         return False
 
     def add_arg(self, arg_value: ArgValue, arg_type: str=None) -> None:
@@ -81,8 +78,8 @@ class OscMessageBuilder(object):
         """
         if arg_type and not self._valid_type(arg_type):
             raise ValueError(
-                'arg_type must be one of {}, or an array of valid types'
-                    .format(self._SUPPORTED_ARG_TYPES))
+                f'arg_type must be one of {self._SUPPORTED_ARG_TYPES}, or an array of valid types'
+            )
         if not arg_type:
             arg_type = self._get_arg_type(arg_value)
         if isinstance(arg_type, list):
@@ -150,7 +147,7 @@ class OscMessageBuilder(object):
 
             # Write the parameters.
             arg_types = "".join([arg[0] for arg in self._args])
-            dgram += osc_types.write_string(',' + arg_types)
+            dgram += osc_types.write_string(f',{arg_types}')
             for arg_type, value in self._args:
                 if arg_type == self.ARG_TYPE_STRING:
                     dgram += osc_types.write_string(value)  # type: ignore[arg-type]
@@ -175,9 +172,8 @@ class OscMessageBuilder(object):
                                   self.ARG_TYPE_NIL):
                     continue
                 else:
-                    raise BuildError('Incorrect parameter type found {}'.format(
-                        arg_type))
+                    raise BuildError(f'Incorrect parameter type found {arg_type}')
 
             return osc_message.OscMessage(dgram)
         except osc_types.BuildError as be:
-            raise BuildError('Could not build the message: {}'.format(be))
+            raise BuildError(f'Could not build the message: {be}')

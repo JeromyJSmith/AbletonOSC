@@ -77,9 +77,9 @@ def test_song_listen_tempo(client):
 
 def _test_song_property(client, property, values):
     for value in values:
-        client.send_message("/live/song/set/%s" % property, [value])
+        client.send_message(f"/live/song/set/{property}", [value])
         wait_one_tick()
-        assert client.query("/live/song/get/%s" % property) == (value,)
+        assert client.query(f"/live/song/get/{property}") == (value,)
 
 def test_song_property_arrangement_overdub(client):
     _test_song_property(client, "arrangement_overdub", [1, 0])
